@@ -1,4 +1,4 @@
-from models import players
+from models import player
 
 class Tournament:
     def __init__(self, name, number_of_rounds, location, start_date, end_date, ):
@@ -15,4 +15,3 @@ class Tournament:
         for player in self.players:
             self.players.append(player)
 
-    
