@@ -1,4 +1,3 @@
-from datetime import datetime
 from models.match import Match
 from models.tournament import Tournament
 from models.player import Player
@@ -39,10 +38,10 @@ def generate_players(num_players=8):
     return generated_players
 
 
-def play_round(tournament, round_number):
+def play_round(current_tournament, round_number):
     """Play a full round with the pairs of players."""
     print(TOUR_LABEL.format(round_number))
-    sorted_players = sorted(tournament.players, key=lambda player: player[1], reverse=True)
+    sorted_players = sorted(current_tournament.players, key=lambda player: player[1], reverse=True)
     matches = []
     print(sorted_players[0][0][0])
     match1 = Match(sorted_players[0][0], sorted_players[1][0])
@@ -55,7 +54,7 @@ def play_round(tournament, round_number):
     round.matches.append(match3)
     round.matches.append(match4)
 
-    tournament.add_round(round)
+    current_tournament.add_round(round)
 
     match1.play()
     match2.play()
@@ -63,7 +62,7 @@ def play_round(tournament, round_number):
     match4.play()
 
     for match in round.matches:
-        for player in tournament.players:
+        for player in current_tournament.players:
             if player[0] == match.match[0][0]:
                 player[1] += match.match[0][1]
             if player[0] == match.match[1][0]:
@@ -90,7 +89,7 @@ def play_tournament(tournament, number_of_rounds=4):
         print(player[0])
 
     players = tournament.players
-   # for round_number in range(1, tournament.rounds + 1):
+    # for round_number in range(1, tournament.rounds + 1):
     play_round(tournament, 1)
 
     # display_final_results(players)
@@ -133,6 +132,3 @@ def generate_player_pairs(players):
 """
 
     return pairs
-
-
-
