@@ -1,17 +1,28 @@
-from models import player
-
 class Tournament:
-    def __init__(self, name, number_of_rounds, location, start_date, end_date, ):
+    def __init__(self, name, location,
+                 start_date, end_date,
+                 description="",
+                 num_rounds=4):
         self.name = name
         self.location = location
         self.start_date = start_date
         self.end_date = end_date
-        self.number_of_rounds = number_of_rounds
-        self.current_round = 0
+        self.description = description
+        self.num_rounds = num_rounds
+        self.current_round = 1
         self.rounds = []
         self.players = []
 
     def add_player(self, player):
-        for player in self.players:
-            self.players.append(player)
+        """Adds player to the tournament."""
+        self.players.append([player, 0, []])
+        # Initializes score to 0 and empty opponents list
 
+    def add_round(self, round):
+        """Adds a round to the tournament"""
+        self.rounds.append(round)
+
+    def __repr__(self):
+        return (f"Tournament(name={self.name},"
+                f" location={self.location}, "
+                f"start_date={self.start_date}, end_date={self.end_date})")
