@@ -59,6 +59,7 @@ def play_round(current_tournament, round_number):
     match1.play()
     match2.play()
     match3.play()
+
     match4.play()
 
     for match in round.matches:
@@ -89,6 +90,9 @@ def play_tournament(tournament, number_of_rounds=4):
         print(player[0])
 
     players = tournament.players
+
+    for round_number in range(1, number_of_rounds + 1):
+        play_round(tournament, round_number)
     # for round_number in range(1, tournament.rounds + 1):
     play_round(tournament, 1)
 
@@ -118,7 +122,7 @@ def generate_player_pairs(players):
     pairs = []
     used_players = set()
 
-    """for i, player1 in enumerate(sorted_players):
+    for i, player1 in enumerate(sorted_players):
         if player1 in used_players:
             continue
         for player2 in sorted_players[i + 1:]:
@@ -129,6 +133,5 @@ def generate_player_pairs(players):
                 player1[2].append(player2[0])
                 player2[2].append(player1[0])
                 break
-"""
 
     return pairs
