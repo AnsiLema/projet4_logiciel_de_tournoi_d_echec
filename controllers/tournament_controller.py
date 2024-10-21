@@ -34,7 +34,7 @@ def generate_players(num_players=8):
                 minimum_age=14,
                 maximum_age=95).strftime('%d-%m-%Y')
         )
-        generated_players.append([player, 0, []])  # [Player, points, opponents_list]
+        generated_players.append([player])  # [Player, points, opponents_list]
     return generated_players
 
 
