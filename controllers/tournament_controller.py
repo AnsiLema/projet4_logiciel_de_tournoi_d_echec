@@ -10,6 +10,8 @@ TOUR_LABEL = "--- Tour {} ---"
 MATCHUP_DISPLAY = "{} ({}) vs {} ({})"
 FINAL_RESULTS_LABEL = "--- Résultats finaux ---"
 PLAYER_RESULTS_DISPLAY = "{} {} - Points: {}"
+STANDINGS_LABEL = "--- Classement après le tour {} ---"
+PLAYER_STANDING_DISPLAY = "{} {} - Points totaux: {}"
 
 # Initializes the dummy data generator
 fake = Faker(LOCALE)
@@ -72,8 +74,6 @@ def play_round(current_tournament, round_number):
             f"{match.match[1][0]}"
             f"Score: {match.match[0][1]} - {match.match[1][1]}"
         )
-
-    return
 
 
 def play_tournament(tournament, number_of_rounds=4):
