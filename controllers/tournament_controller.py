@@ -36,7 +36,8 @@ def generate_players(num_players=8):
                 minimum_age=14,
                 maximum_age=95).strftime('%d-%m-%Y')
         )
-        generated_players.append([player, 0, []])  # [Player, points, opponents_list]
+
+        generated_players.append(player)
     return generated_players
 
 
@@ -67,14 +68,25 @@ def play_round(current_tournament, round_number):
     # Add round to the tournament
     current_tournament.add_round(round)
 
-    # Add points to players
+    # Update points and opponents for each player based on match results
     for match in round.matches:
-        for player in current_tournament.players:
-            if player[0] == match.match[0][0]:
-                player[1] += match.match[0][1]
-            if player[0] == match.match[1][0]:
-                player[1] += match.match[1][1]
+        player1, score1 = match.match[0]
+        player2, score2 = match.match[1]
 
+        # Update player1's points and opponent list
+        for player in current_tournament.players:
+            if player[0] == player1:
+                player[1] += score1  # Accumulate score
+                if player2 not in player[2]:  # Avoid adding the same opponent twice
+                    player[2].append(player2)  # Add opponent to the list
+
+        # Update player2's points and opponent list
+        for player in current_tournament.players:
+            if player[0] == player2:
+                player[1] += score2  # Add the score from the match to the player's total points
+                if player1 not in player[2]:
+                    player[2].append(player1)  # Add the opponent to the list of opponents
+        # Display match result
         print(
             f"Match terminé: {match.match[0][0]}"
             f"  vs  "
@@ -90,13 +102,19 @@ def play_tournament(tournament, number_of_rounds=4):
         tournament.add_player(player)
 
     # Display players
-    for player in players:
+    for player in tournament.players:
         print(player[0])
 
     # players = tournament.players
 
     for round_number in range(1, number_of_rounds + 1):
         play_round(tournament, round_number)
+
+        # Display players
+    for player in tournament.players:
+        print(player[0].lastname + " - " + str(player[1]))
+        for opponent in player[2]:
+            print(opponent.lastname)
 
 
 def display_matchups(pairs):
