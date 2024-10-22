@@ -36,7 +36,6 @@ def generate_players(num_players=8):
                 minimum_age=14,
                 maximum_age=95).strftime('%d-%m-%Y')
         )
-
         generated_players.append(player)
     return generated_players
 
@@ -45,52 +44,52 @@ def play_round(current_tournament, round_number):
     """Play a full round with the pairs of players, update points and opponents"""
     print(TOUR_LABEL.format(round_number))
 
-    # Sort players to get matching pairs
-    sorted_players = sorted(current_tournament.players, key=lambda player: player[1], reverse=True)
-    # matches = []
-    match1 = Match(sorted_players[0][0], sorted_players[1][0])
-    match2 = Match(sorted_players[2][0], sorted_players[3][0])
-    match3 = Match(sorted_players[4][0], sorted_players[5][0])
-    match4 = Match(sorted_players[6][0], sorted_players[7][0])
-    # Creates a new Round object
-    round = Round("round " + str(round_number))
-    round.matches.append(match1)
-    round.matches.append(match2)
-    round.matches.append(match3)
-    round.matches.append(match4)
+    sorted_players = sort_players(current_tournament)
+    matches = create_matches(sorted_players)
 
-    # Play matches
-    match1.play()
-    match2.play()
-    match3.play()
-    match4.play()
+    round = Round(f"round {round_number}")
+    round.matches.extend(matches)
 
-    # Add round to the tournament
+    for match in matches:
+        match.play()
+
     current_tournament.add_round(round)
 
-    # Update points and opponents for each player based on match results
+    update_player_info(current_tournament, round)
+    display_match_results(round)
+
+
+def sort_players(current_tournament):
+    return sorted(current_tournament.players, key=lambda player: player[1], reverse=True)
+
+
+def create_matches(sorted_players):
+    return [
+        Match(sorted_players[i][0], sorted_players[i + 1][0])
+        for i in range(0, len(sorted_players), 2)
+    ]
+
+
+def update_player_info(current_tournament, round):
     for match in round.matches:
         player1, score1 = match.match[0]
         player2, score2 = match.match[1]
+        update_player_stats(current_tournament, player1, score1, player2)
+        update_player_stats(current_tournament, player2, score2, player1)
 
-        # Update player1's points and opponent list
-        for player in current_tournament.players:
-            if player[0] == player1:
-                player[1] += score1  # Accumulate score
-                if player2 not in player[2]:  # Avoid adding the same opponent twice
-                    player[2].append(player2)  # Add opponent to the list
 
-        # Update player2's points and opponent list
-        for player in current_tournament.players:
-            if player[0] == player2:
-                player[1] += score2  # Add the score from the match to the player's total points
-                if player1 not in player[2]:
-                    player[2].append(player1)  # Add the opponent to the list of opponents
-        # Display match result
+def update_player_stats(current_tournament, player, score, opponent):
+    for p in current_tournament.players:
+        if p[0] == player:
+            p[1] += score
+            if opponent not in p[2]:
+                p[2].append(opponent)
+
+
+def display_match_results(round):
+    for match in round.matches:
         print(
-            f"Match terminé: {match.match[0][0]}"
-            f"  vs  "
-            f"{match.match[1][0]}"
+            f"Match terminé: {match.match[0][0]} vs {match.match[1][0]} "
             f"Score: {match.match[0][1]} - {match.match[1][1]}"
         )
 
@@ -104,8 +103,6 @@ def play_tournament(tournament, number_of_rounds=4):
     # Display players
     for player in tournament.players:
         print(player[0])
-
-    # players = tournament.players
 
     for round_number in range(1, number_of_rounds + 1):
         play_round(tournament, round_number)
@@ -121,7 +118,8 @@ def display_matchups(pairs):
     """Shows player matchups for a round."""
     print("Matchups:")
     for player1, player2 in pairs:
-        print(MATCHUP_DISPLAY.format(player1[0].first_name, sum(player1[1]), player2[0].first_name, sum(player2[1])))
+        print(MATCHUP_DISPLAY.format(player1[0].first_name, sum(player1[1]),
+                                     player2[0].first_name, sum(player2[1])))
 
 
 def display_final_results(players):
