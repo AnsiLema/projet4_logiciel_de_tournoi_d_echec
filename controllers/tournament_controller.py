@@ -16,15 +16,6 @@ PLAYER_STANDING_DISPLAY = "{} {} - Points totaux: {}"
 # Initializes the dummy data generator
 fake = Faker(LOCALE)
 
-# Create the tournament
-tournament = Tournament(
-    name=fake.name(),
-    location=fake.city(),
-    start_date=fake.date(),
-    end_date=fake.date()
-)
-
-
 def generate_players(num_players=8):
     generated_players = []
     for _ in range(num_players):
@@ -39,18 +30,49 @@ def generate_players(num_players=8):
         generated_players.append(player)
     return generated_players
 
+def generate_player_pairs(players):
+    pairs = []
+    players_with_opponents = []
+
+    for player in players:
+        player_data = {
+            'name': player[0],
+            'score': player[1],
+            'opponents': player[2]
+        }
+        players_with_opponents.append(player_data)
+
+    while len(players_with_opponents) > 1:
+        players_with_opponents.sort(key=lambda x: x['score'], reverse=True)
+        player1 = players_with_opponents[0]
+        player2 = None
+
+        for opponent in players_with_opponents[1:]:
+            if opponent['name'] not in player1['opponents']:
+                player2 = opponent
+                break
+
+        if player2 is None:
+            raise ValueError("Impossible de trouver un adversaire pour le joueur {}".format(player1['name']))
+
+        pairs.append((player1['name'], player2['name']))
+        player1['opponents'].append(player2['name'])
+        player2['opponents'].append(player1['name'])
+        players_with_opponents.remove(player1)
+        players_with_opponents.remove(player2)
+
+    return pairs
 
 def play_round(current_tournament, round_number):
-    """Play a full round with the pairs of players, update points and opponents"""
     print(TOUR_LABEL.format(round_number))
 
     sorted_players = sort_players(current_tournament)
-    matches = create_matches(sorted_players)
+    pairs = generate_player_pairs(sorted_players)
 
     round = Round(f"round {round_number}")
-    round.matches.extend(matches)
+    round.matches.extend(pairs)
 
-    for match in matches:
+    for match in round.matches:
         match.play()
 
     current_tournament.add_round(round)
@@ -58,17 +80,14 @@ def play_round(current_tournament, round_number):
     update_player_info(current_tournament, round)
     display_match_results(round)
 
-
 def sort_players(current_tournament):
     return sorted(current_tournament.players, key=lambda player: player[1], reverse=True)
-
 
 def create_matches(sorted_players):
     return [
         Match(sorted_players[i][0], sorted_players[i + 1][0])
         for i in range(0, len(sorted_players), 2)
     ]
-
 
 def update_player_info(current_tournament, round):
     for match in round.matches:
@@ -77,14 +96,12 @@ def update_player_info(current_tournament, round):
         update_player_stats(current_tournament, player1, score1, player2)
         update_player_stats(current_tournament, player2, score2, player1)
 
-
 def update_player_stats(current_tournament, player, score, opponent):
     for p in current_tournament.players:
         if p[0] == player:
             p[1] += score
             if opponent not in p[2]:
                 p[2].append(opponent)
-
 
 def display_match_results(round):
     for match in round.matches:
@@ -93,61 +110,28 @@ def display_match_results(round):
             f"Score: {match.match[0][1]} - {match.match[1][1]}"
         )
 
-
 def play_tournament(tournament, number_of_rounds=4):
-    """Simulates a tournament with a given number of rounds."""
     players = generate_players()
     for player in players:
         tournament.add_player(player)
 
-    # Display players
-    for player in tournament.players:
-        print(player[0])
-
     for round_number in range(1, number_of_rounds + 1):
         play_round(tournament, round_number)
 
-        # Display players
     for player in tournament.players:
         print(player[0].lastname + " - " + str(player[1]))
         for opponent in player[2]:
             print(opponent.lastname)
 
-
 def display_matchups(pairs):
-    """Shows player matchups for a round."""
     print("Matchups:")
     for player1, player2 in pairs:
         print(MATCHUP_DISPLAY.format(player1[0].first_name, sum(player1[1]),
                                      player2[0].first_name, sum(player2[1])))
 
-
 def display_final_results(players):
-    """Shows the final results of the tournament."""
     print(FINAL_RESULTS_LABEL)
     for player in sorted(players, key=lambda p: sum(p[1]), reverse=True):
         print(PLAYER_RESULTS_DISPLAY.format(player[0].first_name,
                                             player[0].last_name,
                                             sum(player[1])))
-
-
-def generate_player_pairs(players):
-    """Generates player pairs for a round based on points, avoiding repeat opponents."""
-    sorted_players = sorted(players, key=lambda player: player[1], reverse=True)
-    pairs = []
-    used_players = set()
-
-    for i, player1 in enumerate(sorted_players):
-        if player1 in used_players:
-            continue
-        for player2 in sorted_players[i + 1:]:
-            # Ensure players haven't already faced each other
-            if player2 not in used_players and player2[0] not in player1[2]:
-                pairs.append((player1, player2))
-                used_players.add(player1)
-                used_players.add(player2)
-                player1[2].append(player2[0])  # Add to opponent list
-                player2[2].append(player1[0])  # Add to opponent list
-                break
-
-    return pairs
