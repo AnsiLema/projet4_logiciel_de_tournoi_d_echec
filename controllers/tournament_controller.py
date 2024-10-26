@@ -91,7 +91,6 @@ def play_tournament(tournament, number_of_rounds=4):
     for round_number in range(1, number_of_rounds + 1):
         play_round(tournament, round_number)
 
-
 def display_matchups(pairs):
     """Shows player matchups for a round."""
     print("Matchups:")
