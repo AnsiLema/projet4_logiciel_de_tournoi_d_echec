@@ -1,31 +1,22 @@
 class View:
-    def __init__(self):
-        pass
+    def display_message(self, message):
+        """Display a message to the user"""
+        print(message)
 
-    def display_tournament_name(self, tournament_name):
-        print(f"Nom du tournoi : {tournament_name}")
-
-    def display_player_info(self, player):
-        print(f"Nom : {player.lastname} {player.firstname}")
-        print(f"Identifiant national : {player.national_id}")
-        print(f"Date de naissance : {player.birth_date}")
-
-    def display_tournament_players(self, players):
-        print("Liste des joueurs du tournoi :")
-        for player in players:
-            self.display_player_info(player)
-            print()
-
-    def display_tournament_rounds(self, rounds):
-        print("Liste des tours du tournoi :")
-        for round in rounds:
-            print(f"Tour {round}")
-
-    def display_menu(self):
-        print("Menu :")
-        print("1. Créer un tournoi")
-        print("2. Lancer un tournoi")
-        print("3. Quitter")
-
-    def get_user_input(self, prompt):
+    def get_input(self, prompt):
+        """Ask the user for an input with a prompt"""
         return input(prompt)
+
+    def get_choice(self, choices):
+        """Ask the user for an input with a list of choices"""
+        for index, choice in enumerate(choices):
+            print(f"{index+1}. {choice}")
+
+        while True:
+            try:
+                choice = int(input("Enter your choice: "))
+                if choice in range(1, len(choices)+1):
+                    return choice
+            except ValueError:
+                print("Invalid choice. Please try again.")
+
