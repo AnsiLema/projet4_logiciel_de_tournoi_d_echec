@@ -20,3 +20,6 @@ class PlayerView(View):
     def search_players(self):
         return self.get_input("Entrez les premières lettres du nom du joueur: ")
 
+    def get_player_info(self):
+        # Code pour récupérer les informations d'un joueur
+        pass

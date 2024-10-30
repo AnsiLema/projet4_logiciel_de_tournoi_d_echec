@@ -7,13 +7,14 @@ class TournamentView(View):
         location = self.get_input("Lieu du tournoi: ")
         start_date = self.get_input("Date de commencement du tournoi (jj/mm/aaaa): ")
         description = self.get_input("Description du tournoi: ")
-        number_of_rounds = int(self.get_input("Nombre de rounds: "))
+        number_of_rounds = self.get_input("Nombre de rounds: ")
         return {
             "name": name,
             "location": location,
             "start_date": start_date,
+            "end_date": None,
             "description": description,
-            "number_of_rounds": number_of_rounds
+            "number_of_rounds": int(number_of_rounds)
         }
 
     def show_tournament(self, tournament):

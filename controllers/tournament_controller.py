@@ -4,7 +4,6 @@ from models.player import Player
 from models.round import Round
 from views.player_view import PlayerView
 from views.tournament_view import TournamentView
-from views.view import View
 
 # Extract constants for tournament information
 LOCALE = "fr_FR"
@@ -15,6 +14,33 @@ PLAYER_RESULTS_DISPLAY = "{} {} - Points: {}"
 STANDINGS_LABEL = "--- Classement après le tour {} ---"
 PLAYER_STANDING_DISPLAY = "{} {} - Points totaux: {}"
 
+from faker import Faker
+from models.player import Player
+
+# Initialiser Faker avec la locale française
+fake = Faker("fr_FR")
+
+def create_players(num_players=8):
+    """Creates a list of Player objects with random data using Faker."""
+    players = []
+    for _ in range(num_players):
+        player = Player(
+            firstname=fake.first_name(),
+            lastname=fake.last_name(),
+            national_id=fake.bothify(text='??#####').upper(),
+            birth_date=fake.date_of_birth(
+                minimum_age=14,
+                maximum_age=95).strftime('%d-%m-%Y')
+        )
+        players.append(player)
+    return players
+
+# Générer 8 joueurs pour tester
+players = create_players(8)
+
+# Afficher les joueurs générés
+for player in players:
+    print(player)
 
 def play_round(current_tournament, round_number):
     """Play a full round with the pairs of players."""
@@ -48,8 +74,15 @@ def play_round(current_tournament, round_number):
         )
 
 
-def play_tournament(tournament, number_of_rounds=4):
+def play_tournament(tournament, number_of_rounds):
     """Simulates a tournament with a given number of rounds."""
+
+    tournament_view = TournamentView()
+    tournament_info = tournament_view.get_tournament_info()
+    tournament.name = tournament_info["name"]
+    tournament.location = tournament_info["location"]
+    tournament.start_date = tournament_info["start_date"]
+    tournament_view.show_tournament(tournament)
 
     print(f"Tournament: {tournament.name}")
     players = tournament.players
